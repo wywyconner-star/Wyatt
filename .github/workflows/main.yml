@@ -13,13 +13,23 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          
+          - name: Windowsa
+            os: windows-latest
+
+          - name: macOS
+            os: macos-latest
 
           - name: iOS
             os: macos-latest
             target: iOS
 
-        
+          - name: Android32
+            os: ubuntu-latest
+            target: Android32
+
+          - name: Android64
+            os: ubuntu-latest
+            target: Android64
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -27,13 +37,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clone compatible 2.2081 bindings
+        run: |
+          git clone [github.com](https://github.com/geode-sdk/bindings.git) "${{ github.workspace }}/bindings-repo"
+          cd "${{ github.workspace }}/bindings-repo"
+          git checkout 7407717c307d1cd94461786210b330ab868f4260
+          echo "GEODE_BINDINGS_REPO_PATH=${{ github.workspace }}/bindings-repo" >> $GITHUB_ENV
+
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
           target: ${{ matrix.config.target }}
-          sdk: v5.11.2
-      
+          configure-args: -DSKIP_BUILDING_CODEGEN=OFF
 
   package:
     name: Package builds
