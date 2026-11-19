@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - name: Windowsa
+          - name: Windows
             os: windows-latest
 
           - name: macOS
@@ -37,19 +37,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clone compatible 2.2081 bindings
-        run: |
-          git clone [github.com](https://github.com/geode-sdk/bindings.git) "${{ github.workspace }}/bindings-repo"
-          cd "${{ github.workspace }}/bindings-repo"
-          git checkout 7407717c307d1cd94461786210b330ab868f4260
-          echo "GEODE_BINDINGS_REPO_PATH=${{ github.workspace }}/bindings-repo" >> $GITHUB_ENV
-
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
           target: ${{ matrix.config.target }}
-          configure-args: -DSKIP_BUILDING_CODEGEN=OFF
+          bindings: vwtfafa/bindings
+          bindings-ref: fix/2.2081-depends
 
   package:
     name: Package builds
